@@ -4,9 +4,15 @@ using UnityEngine;
 using Robot;
 
 public class PointerController : MonoBehaviour {
-
+    
     public BasicTouchMovement receiver;
     public ITargetReceivable Receiver;
+
+    public float MaxReleaseWait = 5f;
+    public float MaxMouseDistance = 20f;
+
+    private float timeStart;
+    private Vector3 mouseStart;
 
     private int layerMask = 1 << 8;
     // Use this for initialization
@@ -25,7 +31,15 @@ public class PointerController : MonoBehaviour {
 
         if (Input.GetMouseButtonDown(0))
         {
-            Receiver.SetTarget(hit.point);
+            timeStart = Time.time;
+            mouseStart = Input.mousePosition;
+        }
+        if (Input.GetMouseButtonUp(0)) { 
+            if (Time.time - timeStart <= MaxReleaseWait && Vector3.Distance(mouseStart,Input.mousePosition) <= MaxMouseDistance)
+            {
+                Receiver.SetTarget(hit.point);
+            }
+            
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Robot;
+using UnityStandardAssets.Characters.ThirdPerson;
 
 public class BasicTouchMovement : MonoBehaviour, ITargetReceivable
 {
@@ -11,13 +12,18 @@ public class BasicTouchMovement : MonoBehaviour, ITargetReceivable
     private Vector3 currentTarget;
     private bool hasTarget;
 
+    private PointerController pointer;
+
     public float Speed = 7;
 
-    public void SetTarget(Vector3 position)
+    public void SetTarget(Vector3 position, PointerController controller)
     {
+        pointer = controller;
+        pointer.FreezeTransform = true;
         if (hasTarget)
         {
-            targets.Enqueue(position);
+            //targets.Enqueue(position);
+            currentTarget = position;
         }
         else
         {
@@ -36,13 +42,23 @@ public class BasicTouchMovement : MonoBehaviour, ITargetReceivable
     void Update()
     {
         if (hasTarget && Vector3.Distance(currentTarget, this.transform.position) > 0.5){
-            this.transform.LookAt(currentTarget);
-            this.transform.position = Vector3.MoveTowards(this.transform.position, currentTarget, Speed * Time.fixedDeltaTime);
+            //this.transform.LookAt(currentTarget);
+            pointer.transform.position = currentTarget;
+            //;
+            Vector3 move = currentTarget - this.transform.position;
+            this.GetComponentInParent<ThirdPersonCharacter>().Move(move, false, false);
         } else
         {
             if (targets.Count > 0)
             {
                 currentTarget = targets.Dequeue();
+            } else
+            {
+                if (hasTarget)
+                {
+                    pointer.FreezeTransform = false;
+                    hasTarget = false;
+                }
             }
         }
     }

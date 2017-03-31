@@ -6,6 +6,6 @@ namespace Robot
 
     public interface ITargetReceivable
     {
-        void SetTarget(Vector3 position);
+        void SetTarget(Vector3 position, PointerController controller);
     }
 }

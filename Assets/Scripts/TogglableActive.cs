@@ -1,15 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TogglableActive : MonoBehaviour {
-
-    public string cow;
-	public bool ToggleActive()
+    
+	public void ToggleActive()
     {
         bool nextState = !this.gameObject.activeSelf;
         this.gameObject.SetActive(nextState);
-
-        return nextState;
+        
     }
 }

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Robot;
 
-public class PointerController : MonoBehaviour {
-    
+public class PointerController : MonoBehaviour
+{
+
     public BasicTouchMovement receiver;
     public ITargetReceivable Receiver;
 
@@ -14,26 +15,32 @@ public class PointerController : MonoBehaviour {
     private float timeStart;
     private Vector3 mouseStart;
 
-    private int layerMask = 1 << 8;
+    public static LayerMask terrainLayer = 1 << 8;
 
     public bool FreezeTransform = false;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         Receiver = receiver;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, layerMask))
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrainLayer))
+        {
+            if (!FreezeTransform)
             {
-                if (!FreezeTransform)
-                {
-                    this.transform.position = hit.point;
-                }
+                this.transform.position = hit.point;
             }
 
             if (Input.GetMouseButtonDown(0))
@@ -43,11 +50,22 @@ public class PointerController : MonoBehaviour {
             }
             if (Input.GetMouseButtonUp(0))
             {
-                if (Time.time - timeStart <= MaxReleaseWait && Vector3.Distance(mouseStart, Input.mousePosition) <= MaxMouseDistance)
+                if (isStillConsideredClick())
                 {
                     Receiver.SetTarget(hit.point, this);
                 }
 
             }
+        }
+        else
+        {
+
+        }
+
+    }
+
+    private bool isStillConsideredClick()
+    {
+        return Time.time - timeStart <= MaxReleaseWait && Vector3.Distance(mouseStart, Input.mousePosition) <= MaxMouseDistance;
     }
 }
